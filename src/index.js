@@ -128,11 +128,8 @@ function gameOver() {
     let gameStopped = stopGame();
     return gameStopped;
   }
-  let timeoutId = showUp();
-  return timeoutId;
+  showUp();
 }
-  
-
 /**
 *
 * Calls the showAndHide() function with a specific delay and a hole.
@@ -142,10 +139,19 @@ function gameOver() {
 * to call `showAndHide(hole, delay)`.
 *
 */
+let currentMolePromise = Promise.resolve();
+
 function showUp() {
-  let delay = setDelay(difficulty); // call setDelay()
-  const hole = chooseHole(holes); // call chooseHole()
-  return showAndHide(hole, delay);
+  currentMolePromise = currentMolePromise
+    .then(() => {
+      if (time <= 0) {
+        return Promise.resolve();
+      }
+      let delay = setDelay(difficulty);
+      const hole = chooseHole(holes);
+      return showAndHide(hole, delay);
+    });
+  return currentMolePromise;
 }
 
 
@@ -157,18 +163,17 @@ function showUp() {
 * the timeoutID
 *
 */
-function showAndHide(hole, delay){
-  // Call the toggleVisibility() function so that it adds the show class.
+function showAndHide(hole, delay) {
   toggleVisibility(hole);
-
-  const timeoutID = setTimeout(() => {
-    // Call the toggleVisibility() function so that it removes the show class when the timer times out.
-    toggleVisibility(hole);
-
-    gameOver();
-  }, delay); // Change the setTimeout() delay to the one provided as a parameter
-  return timeoutID;
+  return new Promise(resolve => {
+    setTimeout(() => {
+      toggleVisibility(hole);
+      gameOver();
+      resolve();
+    }, delay);
+  });
 }
+
 
 
 /**
@@ -302,7 +307,8 @@ function setDuration(duration) {
 function stopGame(){
   stop();
   clearInterval(timer);
-  moles.forEach(hole => hole.classList.remove('show'));  // Ensure all moles are hidden when the game is over.
+  moles.forEach(hole => hole.classList.remove('show'));
+  currentMolePromise = Promise.resolve();
   return "game stopped";
 }
 
@@ -319,7 +325,7 @@ function startGame(){
   startTimer();  // Start the timer.
   setEventListeners();  // Set event listeners.
   moles.forEach(hole => hole.classList.remove('show'));  // Ensure all moles are hidden at the start.
-  showUp();
+  timerId = showUp();
   return "game started";
 }
 
