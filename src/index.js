@@ -331,7 +331,7 @@ function startGame(){
 
 startButton.addEventListener("click", startGame);
 
-setInterval(gameOver, 1000);
+
 
 
 // Please do not modify the code below.
