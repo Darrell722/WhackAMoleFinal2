@@ -155,6 +155,7 @@ function showUp() {
 }
 
 
+
 /**
 *
 * The purpose of this function is to show and hide the mole given
@@ -173,8 +174,6 @@ function showAndHide(hole, delay) {
     }, delay);
   });
 }
-
-
 
 /**
 *
@@ -331,7 +330,7 @@ function startGame(){
 
 startButton.addEventListener("click", startGame);
 
-
+setInterval(gameOver, 1000);
 
 
 // Please do not modify the code below.
